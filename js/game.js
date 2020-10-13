@@ -1,4 +1,4 @@
-// Cansas settings
+// Canvas settings
 let canvas = document.createElement("canvas");
 let ctx = canvas.getContext("2d");
 canvas.width = 512;
@@ -36,41 +36,18 @@ monsterImage.onload = function () {
 	monsterReady = true;
 };
 monsterImage.src = "images/monster.png";
-
-let monster1Ready = false;
-let monster1Image = new Image();
-monster1Image.onload = function () {
-	monster1Ready = true;
-};
-monster1Image.src = "images/monster.png";
-
-
-
-
-
-
-// function getRandomLava(min, max) {
-// 	let number = Math.round(Math.random() * (max - min) + min)
-//
-// 	while(number < canvas.width/2 - 60 && number < canvas.height/2 - 60){
-// 		number = Math.round(Math.random() * (max - min) + min)
-// 	}
-//
-// 		return number
-//
-//
-// }
-
-
-
-
-
-
-
-
-// Game objects
 let monster = {};
-let monster1 = {};
+//Monster 2 Image
+
+let monster2Ready = false;
+let monster2Image = new Image();
+monster2Image.onload = function () {
+	monster2Ready = true;
+};
+monster2Image.src = "images/monster2.png";
+monster2 = {}
+// Game objects
+
 
 
 // Handle keyboard controls
@@ -86,29 +63,41 @@ let heroSpeed = function heroSpeedChecker() {
 
 function hero_x_pp() {
 	if (hero.x <= monster.x) {
-		monster.x -= heroSpeed();
-		// monster1.x -= heroSpeed();
+		monster.x = (monster.x - heroSpeed()) - 0.15
+	}
+
+	if (hero.x <= monster2.x) {
+		monster2.x -= heroSpeed();
 	}
 }
 
 function hero_x_mm() {
 	if (hero.x >= monster.x) {
-		monster.x += heroSpeed();
-		// monster1.x += heroSpeed();
+		monster.x = (monster.x + heroSpeed()) - 0.15
+	}
+
+	if (hero.x >= monster2.x) {
+		monster2.x += heroSpeed();
 	}
 }
 
 function hero_y_pp() {
 	if (hero.y <= monster.y) {
-		monster.y -= heroSpeed();
-		// monster1.y -= heroSpeed();
+		monster.y = (monster.y - heroSpeed()) - 0.15
+	}
+
+	if (hero.y <= monster2.y) {
+		monster2.y -= heroSpeed();
 	}
 }
 
 function hero_y_mm() {
 	if (hero.y >= monster.y) {
-		monster.y += heroSpeed();
-		// monster1.y += heroSpeed();
+		monster.y = (monster.y + heroSpeed()) - 0.15
+	}
+
+	if (hero.y >= monster2.y) {
+		monster2.y += heroSpeed();
 	}
 }
 
@@ -129,15 +118,15 @@ hero.x = canvas.width / 2;
 hero.y = canvas.height / 2;
 
 let houses = [{
-	x: 390,
-	y: -10
-},{
-	x: -10,
-	y: 260
-},{
-	x: 490,
-	y: 390
-}
+		x: 390,
+		y: -10
+	},{
+		x: -10,
+		y: 260
+	},{
+		x: 490,
+		y: 390
+	}
 ]
 
 function getRandomLava(min, max) {
@@ -146,9 +135,11 @@ function getRandomLava(min, max) {
 	while(numberStatus != 1) {
 		var number = Math.round(Math.random() * (max - min) + min)
 
-		if(number < (hero.y - 60) || number > (hero.y + 60)) {
-			if(number < (hero.x - 60) || number > (hero.x + 60)) {
-				numberStatus = 1
+		if((60 < number < (canvas.width + 60)) && (60 < number < (canvas.height + 60))) {
+			if(number < (hero.y - 60) || number > (hero.y + 60)) {
+				if(number < (hero.x - 60) || number > (hero.x + 60)) {
+					numberStatus = 1
+				}
 			}
 		}
 	}
@@ -172,13 +163,20 @@ let reset = function () {
 	}
 
 	let house = getRandomHouse(0,2)
-	let house1 = getRandomHouse(0,2)
 
 	monster.x = houses[house].x
 	monster.y = houses[house].y
+}
 
-	monster1.x = houses[house1].x
-	monster1.y = houses[house1].y
+let reset2 = function () {
+	function getRandomHouse(min, max) {
+		return Math.round(Math.random() * (max - min) + min)
+	}
+
+	let house2 = getRandomHouse(0,2)
+
+	monster2.x = houses[house2].x
+	monster2.y = houses[house2].y
 }
 
 let playerDead = function () {
@@ -186,6 +184,7 @@ let playerDead = function () {
 	hero.y = canvas.height / 2
 
 	reset()
+	reset2()
 }
 
 let hearts = 4
@@ -223,11 +222,13 @@ let update = function (modifier) {
 		hearts--
 	}
 
+
+
 	if(
-		hero.x <= (monster1.x + 32)
-		&& monster1.x <= (hero.x + 32)
-		&& hero.y <= (monster1.y + 32)
-		&& monster1.y <= (hero.y + 32)
+		hero.x <= (monster2.x + 32)
+		&& monster2.x <= (hero.x + 32)
+		&& hero.y <= (monster2.y + 32)
+		&& monster2.y <= (hero.y + 32)
 		||
 		hero.x <= (lavaCoords[0] + 32)
 		&& lavaCoords[0] <= (hero.x + 32)
@@ -240,11 +241,13 @@ let update = function (modifier) {
 		hearts--
 	}
 
+
+
 	if(
 		lavaCoords[0] <= (monster.x + 32)
-		&& monster1.x <= (lavaCoords[0] + 32)
-		&& lavaCoords[1] <= (monster1.y + 32)
-		&& monster1.y <= (lavaCoords[1] + 32)
+		&& monster.x <= (lavaCoords[0] + 32)
+		&& lavaCoords[1] <= (monster.y + 32)
+		&& monster.y <= (lavaCoords[1] + 32)
 	) {
 		reset()
 		score++
@@ -252,13 +255,17 @@ let update = function (modifier) {
 		lavaCoords = [getRandomLava(60, canvas.width - 60), getRandomLava(60, canvas.height - 60)]
 	}
 
+
+
+
+
 	if(
-		lavaCoords[0] <= (monster1.x + 32)
-		&& monster1.x <= (lavaCoords[0] + 32)
-		&& lavaCoords[1] <= (monster1.y + 32)
-		&& monster1.y <= (lavaCoords[1] + 32)
+		lavaCoords[0] <= (monster2.x + 32)
+		&& monster2.x <= (lavaCoords[0] + 32)
+		&& lavaCoords[1] <= (monster2.y + 32)
+		&& monster2.y <= (lavaCoords[1] + 32)
 	) {
-		reset()
+		reset2()
 		score++
 
 		lavaCoords = [getRandomLava(60, canvas.width - 60), getRandomLava(60, canvas.height - 60)]
@@ -279,8 +286,8 @@ let render = function () {
 		ctx.drawImage(monsterImage, monster.x, monster.y);
 	}
 
-	if(monster1Ready) {
-		ctx.drawImage(monster1Image, monster1.x, monster1.y);
+	if(monster2Ready) {
+		ctx.drawImage(monster2Image, monster2.x, monster2.y);
 	}
 
 	if(lavaReady) {
@@ -317,4 +324,5 @@ requestAnimationFrame = w.requestAnimationFrame || w.webkitRequestAnimationFrame
 // Let's play this game!
 let then = Date.now();
 reset();
+reset2();
 main();
