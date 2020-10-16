@@ -24,6 +24,8 @@ heroImage.onload = function () {
 	heroReady = true;
 };
 heroImage.src = "images/hero.png";
+heroImage.width = 30
+heroImage.height = 30
 
 let hero = {
 	speed: 256 // movement in pixels per second
@@ -183,12 +185,18 @@ let playerDead = function () {
 	hero.x = canvas.width / 2
 	hero.y = canvas.height / 2
 
-	reset()
-	reset2()
+	setTimeout(reset, 1000)
+}
+
+let playerDeadScreen = function () {
+	hero.x = canvas.width / 2
+	hero.y = canvas.height / 2
+
+	document.getElementById('deadScreen').style.display = 'block'
 }
 
 let hearts = 4
-let score = 0
+var score = 0
 
 let update = function (modifier) {
 	if (38 in keysDown) { // Player holding up
@@ -218,7 +226,11 @@ let update = function (modifier) {
 	) {
 		healths[hearts].innerHTML = '';
 		playerDead()
-		console.log(hearts)
+
+		if(hearts === 0) {
+			playerDeadScreen()
+		}
+
 		hearts--
 	}
 
@@ -237,7 +249,11 @@ let update = function (modifier) {
 	) {
 		healths[hearts].innerHTML = '';
 		playerDead()
-		console.log(hearts)
+
+		if(hearts === 0) {
+			playerDeadScreen()
+		}
+
 		hearts--
 	}
 
@@ -249,7 +265,8 @@ let update = function (modifier) {
 		&& lavaCoords[1] <= (monster.y + 32)
 		&& monster.y <= (lavaCoords[1] + 32)
 	) {
-		reset()
+		setTimeout(reset, 100000)
+		setTimeout(reset2, 100000)
 		score++
 
 		lavaCoords = [getRandomLava(60, canvas.width - 60), getRandomLava(60, canvas.height - 60)]
@@ -265,11 +282,14 @@ let update = function (modifier) {
 		&& lavaCoords[1] <= (monster2.y + 32)
 		&& monster2.y <= (lavaCoords[1] + 32)
 	) {
-		reset2()
+		setTimeout(reset2, 100000)
 		score++
 
 		lavaCoords = [getRandomLava(60, canvas.width - 60), getRandomLava(60, canvas.height - 60)]
 	}
+
+	document.getElementById('score').value = score
+	document.getElementById('score1').value = score
 };
 
 // Draw everything
@@ -293,14 +313,6 @@ let render = function () {
 	if(lavaReady) {
 		ctx.drawImage(lavaImage, lavaCoords[0], lavaCoords[1])
 	}
-
-	// Score
-
-	ctx.fillStyle = "rgb(250, 250, 250)";
-	ctx.font = "24px Helvetica";
-	ctx.textAlign = "left";
-	ctx.textBaseline = "top";
-	ctx.fillText("Goblins dead: " + score, 32, 32);
 };
 
 // The main game loop
@@ -323,6 +335,19 @@ requestAnimationFrame = w.requestAnimationFrame || w.webkitRequestAnimationFrame
 
 // Let's play this game!
 let then = Date.now();
-reset();
-reset2();
+setTimeout(reset, 1000)
+setTimeout(reset2, 1000)
 main();
+
+
+
+let registerBtn = document.getElementById('record')
+let registerCont = document.getElementById('registerCont')
+
+registerBtn.addEventListener('click', () => {
+	if(registerCont.classList.contains('hidden')) {
+		registerCont.classList.remove('hidden')
+	} else {
+		registerCont.classList.add('hidden')
+	}
+})
